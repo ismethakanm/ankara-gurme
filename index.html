@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ankara Gurme Rotası</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Source Sans 3',sans-serif;background:#fdf6ed;color:#2c1a08}
+:root{
+  --bg:#fdf6ed;--card:#fff8f0;--border:#e8d5b7;--text:#2c1a08;--muted:#8a6a45;
+  --accent:#c4521a;--accent2:#7a9e3b;--tag-bg:#f5e6c8;--tag-text:#7a4e1a;
+  --alc:#e8f0d8;--alc-text:#4a7020;--nalc:#fde8d8;--nalc-text:#c4521a;
+  --fav:#e8b84b;
+}
+.container{background:var(--bg);min-height:100vh;padding:0 0 3rem;max-width:640px;margin:0 auto}
+.header{background:var(--accent);padding:1.75rem 1.5rem 1.25rem;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-20px;right:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.07)}
+.header::after{content:'';position:absolute;bottom:-30px;left:30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.header h1{font-family:'Playfair Display',serif;color:#fff;font-size:1.75rem;font-weight:600;letter-spacing:0.02em;position:relative}
+.header p{color:rgba(255,255,255,0.8);font-size:0.85rem;margin-top:0.35rem;position:relative}
+.header .count{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,0.2);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600}
+.search-bar{padding:1rem 1.25rem 0.5rem;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--border)}
+.search-bar input{width:100%;padding:0.65rem 1.1rem;border:1.5px solid var(--border);border-radius:24px;background:var(--card);font-family:'Source Sans 3',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.15s}
+.search-bar input:focus{border-color:var(--accent)}
+.filters{padding:0.75rem 1.25rem;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;background:var(--bg);position:sticky;top:57px;z-index:9;border-bottom:1px solid var(--border)}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:'Source Sans 3',sans-serif}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.alc-toggle{display:flex;align-items:center;gap:8px;padding:0.6rem 1.25rem;background:var(--bg);border-bottom:1px solid var(--border)}
+.toggle-wrap{display:flex;border-radius:20px;border:1.5px solid var(--border);overflow:hidden;background:var(--card)}
+.toggle-btn{padding:5px 15px;font-size:0.77rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Source Sans 3',sans-serif;transition:all 0.15s}
+.toggle-btn.active.alc{background:var(--alc);color:var(--alc-text)}
+.toggle-btn.active.nalc{background:var(--nalc);color:var(--nalc-text)}
+.toggle-btn.active.all{background:var(--accent);color:#fff}
+.section-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--accent);padding:1.1rem 1.25rem 0.5rem;font-weight:600;letter-spacing:0.03em;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);margin-left:4px}
+.cards{padding:0 1.25rem;display:grid;gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;position:relative}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start}
+.card-name{font-family:'Playfair Display',serif;font-size:1.02rem;color:var(--text);font-weight:600;flex:1;padding-right:8px;line-height:1.3}
+.fav-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:0;line-height:1;flex-shrink:0;color:var(--border);transition:color 0.15s}
+.fav-btn.active{color:var(--fav)}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin:0.5rem 0}
+.tag{padding:2px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;background:var(--tag-bg);color:var(--tag-text);letter-spacing:0.03em;text-transform:uppercase}
+.tag.alc{background:var(--alc);color:var(--alc-text)}
+.tag.nalc{background:var(--nalc);color:var(--nalc-text)}
+.card-spec{font-size:0.82rem;font-weight:600;color:var(--accent);margin:0.35rem 0 0.4rem;letter-spacing:0.01em}
+.card-desc{font-size:0.82rem;color:var(--muted);line-height:1.55;margin-bottom:0.55rem}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--border)}
+.address{font-size:0.75rem;color:var(--muted);flex:1}
+.map-link{text-decoration:none;background:var(--accent);color:#fff;font-size:0.72rem;font-weight:600;padding:5px 14px;border-radius:16px;white-space:nowrap;margin-left:8px;transition:opacity 0.15s}
+.map-link:hover{opacity:0.85}
+.no-results{text-align:center;padding:3rem 1.25rem;color:var(--muted);font-family:'Playfair Display',serif;font-size:1rem}
+.favs-only-btn{margin-left:auto;padding:5px 13px;border-radius:16px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:0.75rem;cursor:pointer;font-family:'Source Sans 3',sans-serif;font-weight:500;display:flex;align-items:center;gap:4px;transition:all 0.15s}
+.favs-only-btn.active{background:var(--fav);border-color:var(--fav);color:#fff}
+.footer{text-align:center;padding:2rem 1.25rem 1rem;color:var(--muted);font-size:0.75rem;opacity:0.7}
+.suggest-btn{display:block;margin:1.5rem 1.25rem 0;padding:0.75rem;border-radius:24px;border:1.5px dashed var(--border);background:transparent;color:var(--accent);font-family:'Source Sans 3',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;width:calc(100% - 2.5rem);transition:all 0.15s;text-align:center}
+.suggest-btn:hover{background:var(--card);border-color:var(--accent)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(44,26,8,0.45);z-index:100;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:1.5rem 1.25rem 2rem;width:100%;max-width:640px}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text);margin-bottom:1rem;font-weight:600}
+.modal label{display:block;font-size:0.78rem;font-weight:600;color:var(--muted);margin-bottom:4px;margin-top:0.75rem;text-transform:uppercase;letter-spacing:0.04em}
+.modal input,.modal select,.modal textarea{width:100%;padding:0.6rem 0.9rem;border:1.5px solid var(--border);border-radius:10px;background:#fff;font-family:'Source Sans 3',sans-serif;font-size:0.88rem;color:var(--text);outline:none;transition:border-color 0.15s}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:var(--accent)}
+.modal textarea{resize:none;height:70px}
+.modal-btns{display:flex;gap:10px;margin-top:1.25rem}
+.modal-cancel{flex:1;padding:0.65rem;border-radius:12px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Source Sans 3',sans-serif;font-size:0.85rem;cursor:pointer}
+.modal-send{flex:2;padding:0.65rem;border-radius:12px;border:none;background:var(--accent);color:#fff;font-family:'Source Sans 3',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:opacity 0.15s}
+.modal-send:hover{opacity:0.88}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <span class="count" id="counter">34 mekan</span>
+  <h1>Ankara Gurme Rotası</h1>
+  <p>Şehrin en lezzetli adresleri</p>
+</div>
+<div class="search-bar">
+  <input type="text" id="search" placeholder="Mekan veya kategori ara..." oninput="render()">
+</div>
+<div class="filters" id="filters"></div>
+<div class="alc-toggle">
+  <div class="toggle-wrap">
+    <button class="toggle-btn active all" data-alc="all" onclick="setAlc('all',this)">Tümü</button>
+    <button class="toggle-btn alc" data-alc="alc" onclick="setAlc('alc',this)">İçkili</button>
+    <button class="toggle-btn nalc" data-alc="nalc" onclick="setAlc('nalc',this)">Alkolsüz</button>
+  </div>
+  <button class="favs-only-btn" id="fav-toggle" onclick="toggleFavs()">★ Favoriler</button>
+  <button class="favs-only-btn" onclick="openModal()">+ Öner</button>
+</div>
+<div id="content"></div>
+<div class="footer">Ankara Gurme Rotası · Hakan'ın Seçkileri</div>
+<div class="modal-overlay" id="modal" onclick="closeOnBg(event)">
+  <div class="modal">
+    <h2>Mekan Öner</h2>
+    <label>Mekan Adı</label>
+    <input type="text" id="m-name" placeholder="örn. Köfteci Ramiz">
+    <label>Kategori</label>
+    <input type="text" id="m-cat" placeholder="örn. Köfte & Izgara">
+    <label>Öne Çıkan Yemek</label>
+    <input type="text" id="m-spec" placeholder="örn. ıslak burger">
+    <label>Alkol</label>
+    <select id="m-alc"><option value="Alkolsüz">Alkolsüz</option><option value="İçkili">İçkili</option></select>
+    <label>Adres (opsiyonel)</label>
+    <input type="text" id="m-addr" placeholder="örn. Kızılay, Çankaya">
+    <label>Not (opsiyonel)</label>
+    <textarea id="m-note" placeholder="Neden öneriyorsunuz?"></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Vazgeç</button>
+      <button class="modal-send" onclick="sendSuggest()">Mail Gönder</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+const places=[
+  {name:"Ciğerci Sadi",cat:"Sakatat & Izgara",alc:false,spec:"ciğer",desc:"Ankara'nın efsane ciğercisi. Kızarmış ciğer ve sac kavurma ile ünlü.",addr:"İskitler, Altındağ",map:"https://maps.google.com/?q=Ciğerci+Sadi+İskitler+Ankara"},
+  {name:"Zerdali",cat:"Pastane & Tatlı",alc:false,spec:"profiterol",desc:"Şehrin meşhur profiterolü. Narin choux hamuru ve bol soslu sunumuyla öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Zerdali+Ankara"},
+  {name:"Çukurova Çorba",cat:"Çorba & Ev Yemekleri",alc:false,spec:"kelle paça çorbası",desc:"Çeşit çeşit çorba ve ev usulü yemekler. Sabah erken saatlerde bile açık.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Çukurova+Çorba+Ankara"},
+  {name:"Boşnak Mutfağı Zeliha",cat:"Dünya Mutfağı",alc:false,spec:"közde tavuk",desc:"Otantik Boşnak lezzetleri. Börek, burek ve geleneksel tarifler.",addr:"Altındağ, Ankara",map:"https://maps.google.com/?q=Boşnak+Mutfağı+Zeliha+Ankara"},
+  {name:"Cevat Usta Kahvaltı",cat:"Kahvaltı",alc:false,spec:"kahvaltı",desc:"Geleneksel Türk kahvaltısı. Köy ürünleri ve geniş serpme tabakları.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Cevat+Usta+Kahvaltı+Ankara"},
+  {name:"Meşhur Köfteci Şahin Usta",cat:"Köfte & Izgara",alc:false,spec:"rumeli köftesi",desc:"Yıllardır değişmeyen tarif. İnce köfte, ekmek arası ya da porsiyon.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Köfteci+Şahin+Usta+Ankara"},
+  {name:"Kebapçı Canbolat",cat:"Döner",alc:false,spec:"döner",desc:"Mahallenin vazgeçilmez dönerci durağı. Lezzetli ve bol porsiyonlu.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebapçı+Canbolat+Ankara"},
+  {name:"Cici Piknik",cat:"Döner",alc:false,spec:"döner",desc:"Sevilen dönerci. Lezzetli döner çeşitleri ve hızlı servis.",addr:"Gölbaşı, Ankara",map:"https://maps.google.com/?q=Cici+Piknik+Ankara"},
+  {name:"Uludağ Kebap",cat:"Kebap",alc:true,spec:"iskender",desc:"Türk usulü kebap ve meze çeşitleri. Aile ortamına uygun salon.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Uludağ+Kebap+Ankara"},
+  {name:"Bolu Akın Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"sulu et yemekleri",desc:"Sulu yemek ve tabldot kültürünün güvenilir adresi. Günlük taze pişirilen yemekler.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Bolu+Akın+Lokantası+Ankara"},
+  {name:"Mutlu Kebap",cat:"Kebap",alc:false,spec:"döner",desc:"Sade, lezzetli ve uygun fiyatlı kebap. Hızlı servis.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Mutlu+Kebap+Ankara"},
+  {name:"Kıtır",cat:"Sakatat & Izgara",alc:false,spec:"kokoreç · bira",desc:"Kıtır kokoreç ve enfes bira kombinasyonu. Ankara'nın en bilinen kokoreç duraklarından.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kıtır+Ankara"},
+  {name:"Kokoreççi Hacı",cat:"Sakatat & Izgara",alc:false,spec:"kokoreç",desc:"Usta ellerden çıkan klasik Ankara kokoreç. Baharatlı ve sade seçenekler.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Kokoreççi+Hacı+Ankara"},
+  {name:"Selami Usta",cat:"Döner",alc:false,spec:"döner · adana kebap",desc:"Izgara çeşitleri ve el yapımı köfte. Mahalle lokantası sıcaklığında.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Selami+Usta+Ankara"},
+  {name:"Kalbur",cat:"Deniz Ürünleri",alc:true,spec:"meze · ara sıcak",desc:"Taze balık ve deniz ürünleri. Mevsiminde değişen menü ve rakı sofrası.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kalbur+Balık+Ankara"},
+  {name:"Ara Sıcak",cat:"Meyhane & Meze",alc:true,spec:"meze · ara sıcak",desc:"Rakı sofrası geleneğini yaşatan meyhane. Zengin meze çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Ara+Sıcak+Ankara"},
+  {name:"Tirilye",cat:"Deniz Ürünleri",alc:true,spec:"balık · meze",desc:"Taze balık ve deniz ürünleri. Ege mutfağından ilham alan tarifler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tirilye+Ankara"},
+  {name:"Kumsal",cat:"Deniz Ürünleri",alc:true,spec:"balık · kuzu şiş",desc:"Günlük taze balık. Deniz ürünleri mevsime göre değişen menüyle sunuluyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kumsal+Restoran+Ankara"},
+  {name:"01 Adanalı İsmail Usta",cat:"Kebap",alc:true,spec:"adana kebap",desc:"Adana ve Urfa kebabı uzmanı. Kor ateşinde pişen geleneksel tarif.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Adanalı+İsmail+Usta+Ankara"},
+  {name:"Hamlakit",cat:"Kahvaltı",alc:false,spec:"kahvaltı",desc:"Hamsili pilav ve Karadeniz mutfağının özel tatları.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Hamlakit+Ankara"},
+  {name:"Göksu Lokantası",cat:"Çorba & Ev Yemekleri",alc:false,spec:"sufle",desc:"Güvenilir ev yemeği lokantası. Günlük değişen menü ve çorba çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Göksu+Lokantası+Ankara"},
+  {name:"Stüdyo Pizza",cat:"Pizza & Fast Casual",alc:true,spec:"pizza",desc:"Taş fırında pizza. Yaratıcı soslar ve ince İtalyan hamuru.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Stüdyo+Pizza+Ankara"},
+  {name:"Tiftik",cat:"Burger & Fast Casual",alc:false,spec:"burger · tiramisu",desc:"Ankara'nın sevilen hamburgercisi. El yapımı köfte ve özel soslarıyla öne çıkıyor.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Tiftik+Hamburger+Ankara"},
+  {name:"Düveroğlu",cat:"Kebap",alc:false,spec:"lahmacun · kebap · baklava",desc:"Gaziantep mutfağının Ankara adresi. Katmer, lahmacun ve kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Düveroğlu+Ankara"},
+  {name:"Şehir Kebapçısı",cat:"Kebap",alc:false,spec:"adana",desc:"Şehir merkezi kebap durağı. Lüle ve döner seçenekleri ön planda.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Şehir+Kebapçısı+Ankara"},
+  {name:"Kanatçı Tarık",cat:"Köfte & Izgara",alc:false,spec:"tavuk kanat",desc:"Pişirilme şekliyle ayrışan tavuk kanat. Acılı ve sade seçenekler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kanatçı+Tarık+Ankara"},
+  {name:"Çankaya Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"döner · ev yemeği",desc:"Köklü mahalle lokantası. Ev usulü yemeklerin güvenilir adresi.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Çankaya+Lokantası+Ankara"},
+  {name:"Germeç Tavuk",cat:"Köfte & Izgara",alc:false,spec:"tavuk",desc:"Fırın ve ızgara tavuk çeşitleri. Porsiyon büyüklüğüyle öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Germeç+Tavuk+Ankara"},
+  {name:"Hüsrev",cat:"Esnaf Lokantası",alc:false,spec:"kuru fasulye",desc:"Sulu yemek geleneğini yaşatan köklü esnaf lokantası. Günlük değişen tabldot.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Hüsrev+Ankara"},
+  {name:"Kebap 49",cat:"Kebap",alc:false,spec:"kıymalı pide",desc:"49 yıllık gelenek. Taş fırın ekmeğiyle servis edilen has kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebap+49+Ankara"},
+  {name:"Tarihi Mutfak Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"tandır",desc:"Tarihi binada ev yemeği deneyimi. Geleneksel Ankara mutfağı.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Tarihi+Mutfak+Lokantası+Ankara"},
+  {name:"Tavukçu Lokantası",cat:"Köfte & Izgara",alc:true,spec:"kiremitte işkembe",desc:"Tavuk döner ve ızgara ürünlerinde uzman. Hızlı ve lezzetli.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tavukçu+Lokantası+Ankara"},
+  {name:"Uluçay Tantuni",cat:"Tantuni",alc:false,spec:"tantuni",desc:"Mersin usulü tantuninin Ankara'daki lezzetli adresi. İnce kıyma ve baharatlı sos.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Uluçay+Tantuni+Ankara"},
+  {name:"Sadık Usta Kale Cağ Kebabı",cat:"Kebap",alc:false,spec:"cağ kebabı",desc:"Erzurum usulü cağ kebabı. Kale'nin dibinde, otantik ortamda.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Sadık+Usta+Cağ+Kebabı+Ankara"},
+  {name:"Süha's",cat:"Döner",alc:false,spec:"döner",desc:"Ankara'nın sevilen döner duraklarından biri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Süha+Döner+Ankara"},
+  {name:"Kebapçı Halil Usta",cat:"Kebap",alc:false,spec:"küşleme",desc:"Ustanın elinden çıkan küşleme ile öne çıkan köklü kebapçı.",addr:"Ankara",map:"https://maps.google.com/?q=Kebapçı+Halil+Usta+Ankara"},
+  {name:"Beykoz Paça & İşkembe",cat:"Sakatat & Izgara",alc:false,spec:"kelle paça · işkembe",desc:"Geç saatlerin vazgeçilmezi. Kelle paça ve işkembe çorbası ile ünlü.",addr:"Ankara",map:"https://maps.google.com/?q=Beykoz+Paça+İşkembe+Ankara"},
+  {name:"Etlik Kuzu Kelle Söğüş",cat:"Sakatat & Izgara",alc:false,spec:"söğüş",desc:"Etlik'in meşhur kuzu kelle ve söğüş durağı.",addr:"Etlik, Keçiören",map:"https://maps.google.com/?q=Etlik+Kuzu+Kelle+Söğüş+Ankara"},
+  {name:"Kordon Söğüş",cat:"Sakatat & Izgara",alc:false,spec:"söğüş",desc:"Söğüş severlerin adresi. Taze ve lezzetli kuzu söğüş.",addr:"Ankara",map:"https://maps.google.com/?q=Kordon+Söğüş+Ankara"},
+  {name:"Barış Balık",cat:"Deniz Ürünleri",alc:false,spec:"balık",desc:"Taze balık ve deniz ürünleri. Sade ve lezzetli sunumuyla öne çıkıyor.",addr:"Ankara",map:"https://maps.google.com/?q=Barış+Balık+Ankara"},
+  {name:"Fevzi Hoca",cat:"Deniz Ürünleri",alc:false,spec:"balık",desc:"Ankara'nın sevilen balık adreslerinden. Günlük taze ürünler.",addr:"Ankara",map:"https://maps.google.com/?q=Fevzi+Hoca+Balık+Ankara"},
+  {name:"Müslüm Kebap",cat:"Kebap",alc:false,spec:"adana",desc:"Ankara'nın sevilen kebap duraklarından. Geleneksel tarif ve usta ellerin lezzeti.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Müslüm+Kebap+Ankara"}
+];
+const cats=["Tümü",...[...new Set(places.map(p=>p.cat))].sort()];
+let activecat="Tümü",alcFilter="all",showFavs=false;
+let favs=new Set();
+try{const s=localStorage.getItem('ag_favs');if(s)favs=new Set(JSON.parse(s))}catch(e){}
+function saveFavs(){try{localStorage.setItem('ag_favs',JSON.stringify([...favs]))}catch(e){}}
+function toggleFav(name,e){e.stopPropagation();if(favs.has(name))favs.delete(name);else favs.add(name);saveFavs();render()}
+function toggleFavs(){showFavs=!showFavs;document.getElementById('fav-toggle').classList.toggle('active',showFavs);render()}
+function setAlc(v,el){alcFilter=v;document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');render()}
+function setFilter(cat){activecat=cat;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));render()}
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const filtered=places.filter(p=>{
+    if(q&&!p.name.toLowerCase().includes(q)&&!p.cat.toLowerCase().includes(q)&&!p.desc.toLowerCase().includes(q))return false;
+    if(activecat!=="Tümü"&&p.cat!==activecat)return false;
+    if(alcFilter==="alc"&&!p.alc)return false;
+    if(alcFilter==="nalc"&&p.alc)return false;
+    if(showFavs&&!favs.has(p.name))return false;
+    return true;
+  });
+  document.getElementById('counter').textContent=filtered.length+' mekan';
+  const byCat={};
+  filtered.forEach(p=>{if(!byCat[p.cat])byCat[p.cat]=[];byCat[p.cat].push(p)});
+  let html='';
+  if(!filtered.length){html='<div class="no-results">Sonuç bulunamadı 🍽️</div>'}
+  else{Object.keys(byCat).sort().forEach(cat=>{
+    html+=`<div class="section-title">${cat}</div><div class="cards">`;
+    byCat[cat].forEach(p=>{
+      const isFav=favs.has(p.name);
+      html+=`<div class="card">
+        <div class="card-top">
+          <span class="card-name">${p.name}</span>
+          <button class="fav-btn${isFav?' active':''}" onclick="toggleFav('${p.name.replace(/'/g,"\\'")}',event)">${isFav?'★':'☆'}</button>
+        </div>
+        <div class="tags">
+          <span class="tag">${p.cat}</span>
+          <span class="tag ${p.alc?'alc':'nalc'}">${p.alc?'İçkili':'Alkolsüz'}</span>
+        </div>
+        ${p.spec?`<div class="card-spec">🍽 ${p.spec}</div>`:''}
+        <div class="card-desc">${p.desc}</div>
+        <div class="card-footer">
+          <span class="address">📍 ${p.addr}</span>
+          <a class="map-link" href="${p.map}" target="_blank">Haritada Gör</a>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  })}
+  document.getElementById('content').innerHTML=html;
+}
+const fEl=document.getElementById('filters');
+cats.forEach(c=>{
+  const b=document.createElement('button');
+  b.className='filter-btn'+(c==='Tümü'?' active':'');
+  b.dataset.cat=c;b.textContent=c;
+  b.onclick=()=>setFilter(c);
+  fEl.appendChild(b);
+});
+function openModal(){document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function closeOnBg(e){if(e.target.id==='modal')closeModal()}
+function sendSuggest(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){alert('Mekan adı zorunlu!');return}
+  const cat=document.getElementById('m-cat').value.trim();
+  const spec=document.getElementById('m-spec').value.trim();
+  const alc=document.getElementById('m-alc').value;
+  const addr=document.getElementById('m-addr').value.trim();
+  const note=document.getElementById('m-note').value.trim();
+  const subject=encodeURIComponent('Ankara Gurme Rotası - Mekan Önerisi: '+name);
+  const body=encodeURIComponent(
+    'Merhaba Hakan,\n\nSana bir mekan önermek istiyorum:\n\n'+
+    '📍 Mekan: '+name+'\n'+
+    (cat?'🏷 Kategori: '+cat+'\n':'')+
+    (spec?'🍽 Öne Çıkan Yemek: '+spec+'\n':'')+
+    '🍷 Alkol: '+alc+'\n'+
+    (addr?'📌 Adres: '+addr+'\n':'')+
+    (note?'\nNot: '+note+'\n':'')+
+    '\nAnkara Gurme Rotası uygulamasından gönderildi.'
+  );
+  window.location.href='mailto:ismethakanm@gmail.com?subject='+subject+'&body='+body;
+  closeModal();
+}
+render();
+</script>
+</body>
+</html>
