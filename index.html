@@ -46,7 +46,7 @@ body{font-family:'Source Sans 3',sans-serif;background:#fdf6ed;color:#2c1a08}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin:0.5rem 0}
 .tag{padding:2px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;background:var(--tag-bg);color:var(--tag-text);letter-spacing:0.03em;text-transform:uppercase}
 .tag.alc{background:var(--alc);color:var(--alc-text)}
-.tag.nalc{background:var(--nalc);color:var(--nalc-text)}
+.tag.price{background:#fef3c7;color:#92400e;font-weight:700;letter-spacing:0.05em}
 .card-spec{font-size:0.82rem;font-weight:600;color:var(--accent);margin:0.35rem 0 0.4rem;letter-spacing:0.01em}
 .card-desc{font-size:0.82rem;color:var(--muted);line-height:1.55;margin-bottom:0.55rem}
 .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--border)}
@@ -93,6 +93,13 @@ body{font-family:'Source Sans 3',sans-serif;background:#fdf6ed;color:#2c1a08}
   <button class="favs-only-btn" id="fav-toggle" onclick="toggleFavs()">★ Favoriler</button>
   <button class="favs-only-btn" onclick="openModal()">+ Öner</button>
 </div>
+<div class="alc-toggle" style="border-top:none;padding-top:0">
+  <div class="toggle-wrap">
+    <button class="toggle-btn active all" data-price="all" onclick="setPrice('all',this)">Tümü</button>
+    <button class="toggle-btn" data-price="₺" onclick="setPrice('₺',this)" style="color:#92400e">₺</button>
+    <button class="toggle-btn" data-price="₺₺" onclick="setPrice('₺₺',this)" style="color:#92400e">₺₺</button>
+    <button class="toggle-btn" data-price="₺₺₺" onclick="setPrice('₺₺₺',this)" style="color:#92400e">₺₺₺</button>
+  </div>
 <div id="content"></div>
 <div class="footer">Ankara Gurme Rotası · Hakan'ın Seçkileri</div>
 <div class="modal-overlay" id="modal" onclick="closeOnBg(event)">
@@ -119,58 +126,58 @@ body{font-family:'Source Sans 3',sans-serif;background:#fdf6ed;color:#2c1a08}
 </div>
 <script>
 const places=[
-  {name:"Ciğerci Sadi",cat:"Sakatat & Izgara",alc:false,spec:"ciğer",desc:"Ankara'nın efsane ciğercisi. Kızarmış ciğer ve sac kavurma ile ünlü.",addr:"İskitler, Altındağ",map:"https://maps.google.com/?q=Ciğerci+Sadi+İskitler+Ankara"},
-  {name:"Zerdali",cat:"Pastane & Tatlı",alc:false,spec:"profiterol",desc:"Şehrin meşhur profiterolü. Narin choux hamuru ve bol soslu sunumuyla öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Zerdali+Ankara"},
-  {name:"Çukurova Çorba",cat:"Çorba & Ev Yemekleri",alc:false,spec:"kelle paça çorbası",desc:"Çeşit çeşit çorba ve ev usulü yemekler. Sabah erken saatlerde bile açık.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Çukurova+Çorba+Ankara"},
-  {name:"Boşnak Mutfağı Zeliha",cat:"Dünya Mutfağı",alc:false,spec:"közde tavuk",desc:"Otantik Boşnak lezzetleri. Börek, burek ve geleneksel tarifler.",addr:"Altındağ, Ankara",map:"https://maps.google.com/?q=Boşnak+Mutfağı+Zeliha+Ankara"},
-  {name:"Cevat Usta Kahvaltı",cat:"Kahvaltı",alc:false,spec:"kahvaltı",desc:"Geleneksel Türk kahvaltısı. Köy ürünleri ve geniş serpme tabakları.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Cevat+Usta+Kahvaltı+Ankara"},
-  {name:"Meşhur Köfteci Şahin Usta",cat:"Köfte & Izgara",alc:false,spec:"rumeli köftesi",desc:"Yıllardır değişmeyen tarif. İnce köfte, ekmek arası ya da porsiyon.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Köfteci+Şahin+Usta+Ankara"},
-  {name:"Kebapçı Canbolat",cat:"Döner",alc:false,spec:"döner",desc:"Mahallenin vazgeçilmez dönerci durağı. Lezzetli ve bol porsiyonlu.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebapçı+Canbolat+Ankara"},
-  {name:"Cici Piknik",cat:"Döner",alc:false,spec:"döner",desc:"Sevilen dönerci. Lezzetli döner çeşitleri ve hızlı servis.",addr:"Gölbaşı, Ankara",map:"https://maps.google.com/?q=Cici+Piknik+Ankara"},
-  {name:"Uludağ Kebap",cat:"Kebap",alc:true,spec:"iskender",desc:"Türk usulü kebap ve meze çeşitleri. Aile ortamına uygun salon.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Uludağ+Kebap+Ankara"},
-  {name:"Bolu Akın Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"sulu et yemekleri",desc:"Sulu yemek ve tabldot kültürünün güvenilir adresi. Günlük taze pişirilen yemekler.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Bolu+Akın+Lokantası+Ankara"},
-  {name:"Mutlu Kebap",cat:"Kebap",alc:false,spec:"döner",desc:"Sade, lezzetli ve uygun fiyatlı kebap. Hızlı servis.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Mutlu+Kebap+Ankara"},
-  {name:"Kıtır",cat:"Sakatat & Izgara",alc:false,spec:"kokoreç · bira",desc:"Kıtır kokoreç ve enfes bira kombinasyonu. Ankara'nın en bilinen kokoreç duraklarından.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kıtır+Ankara"},
-  {name:"Kokoreççi Hacı",cat:"Sakatat & Izgara",alc:false,spec:"kokoreç",desc:"Usta ellerden çıkan klasik Ankara kokoreç. Baharatlı ve sade seçenekler.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Kokoreççi+Hacı+Ankara"},
-  {name:"Selami Usta",cat:"Döner",alc:false,spec:"döner · adana kebap",desc:"Izgara çeşitleri ve el yapımı köfte. Mahalle lokantası sıcaklığında.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Selami+Usta+Ankara"},
-  {name:"Kalbur",cat:"Deniz Ürünleri",alc:true,spec:"meze · ara sıcak",desc:"Taze balık ve deniz ürünleri. Mevsiminde değişen menü ve rakı sofrası.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kalbur+Balık+Ankara"},
-  {name:"Ara Sıcak",cat:"Meyhane & Meze",alc:true,spec:"meze · ara sıcak",desc:"Rakı sofrası geleneğini yaşatan meyhane. Zengin meze çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Ara+Sıcak+Ankara"},
-  {name:"Tirilye",cat:"Deniz Ürünleri",alc:true,spec:"balık · meze",desc:"Taze balık ve deniz ürünleri. Ege mutfağından ilham alan tarifler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tirilye+Ankara"},
-  {name:"Kumsal",cat:"Deniz Ürünleri",alc:true,spec:"balık · kuzu şiş",desc:"Günlük taze balık. Deniz ürünleri mevsime göre değişen menüyle sunuluyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kumsal+Restoran+Ankara"},
-  {name:"01 Adanalı İsmail Usta",cat:"Kebap",alc:true,spec:"adana kebap",desc:"Adana ve Urfa kebabı uzmanı. Kor ateşinde pişen geleneksel tarif.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Adanalı+İsmail+Usta+Ankara"},
-  {name:"Hamlakit",cat:"Kahvaltı",alc:false,spec:"kahvaltı",desc:"Hamsili pilav ve Karadeniz mutfağının özel tatları.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Hamlakit+Ankara"},
-  {name:"Göksu Lokantası",cat:"Çorba & Ev Yemekleri",alc:false,spec:"sufle",desc:"Güvenilir ev yemeği lokantası. Günlük değişen menü ve çorba çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Göksu+Lokantası+Ankara"},
-  {name:"Stüdyo Pizza",cat:"Pizza & Fast Casual",alc:true,spec:"pizza",desc:"Taş fırında pizza. Yaratıcı soslar ve ince İtalyan hamuru.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Stüdyo+Pizza+Ankara"},
-  {name:"Tiftik",cat:"Burger & Fast Casual",alc:false,spec:"burger · tiramisu",desc:"Ankara'nın sevilen hamburgercisi. El yapımı köfte ve özel soslarıyla öne çıkıyor.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Tiftik+Hamburger+Ankara"},
-  {name:"Düveroğlu",cat:"Kebap",alc:false,spec:"lahmacun · kebap · baklava",desc:"Gaziantep mutfağının Ankara adresi. Katmer, lahmacun ve kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Düveroğlu+Ankara"},
-  {name:"Şehir Kebapçısı",cat:"Kebap",alc:false,spec:"adana",desc:"Şehir merkezi kebap durağı. Lüle ve döner seçenekleri ön planda.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Şehir+Kebapçısı+Ankara"},
-  {name:"Kanatçı Tarık",cat:"Köfte & Izgara",alc:false,spec:"tavuk kanat",desc:"Pişirilme şekliyle ayrışan tavuk kanat. Acılı ve sade seçenekler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kanatçı+Tarık+Ankara"},
-  {name:"Çankaya Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"döner · ev yemeği",desc:"Köklü mahalle lokantası. Ev usulü yemeklerin güvenilir adresi.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Çankaya+Lokantası+Ankara"},
-  {name:"Germeç Tavuk",cat:"Köfte & Izgara",alc:false,spec:"tavuk",desc:"Fırın ve ızgara tavuk çeşitleri. Porsiyon büyüklüğüyle öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Germeç+Tavuk+Ankara"},
-  {name:"Hüsrev",cat:"Esnaf Lokantası",alc:false,spec:"kuru fasulye",desc:"Sulu yemek geleneğini yaşatan köklü esnaf lokantası. Günlük değişen tabldot.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Hüsrev+Ankara"},
-  {name:"Kebap 49",cat:"Kebap",alc:false,spec:"kıymalı pide",desc:"49 yıllık gelenek. Taş fırın ekmeğiyle servis edilen has kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebap+49+Ankara"},
-  {name:"Tarihi Mutfak Lokantası",cat:"Esnaf Lokantası",alc:false,spec:"tandır",desc:"Tarihi binada ev yemeği deneyimi. Geleneksel Ankara mutfağı.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Tarihi+Mutfak+Lokantası+Ankara"},
-  {name:"Tavukçu Lokantası",cat:"Köfte & Izgara",alc:true,spec:"kiremitte işkembe",desc:"Tavuk döner ve ızgara ürünlerinde uzman. Hızlı ve lezzetli.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tavukçu+Lokantası+Ankara"},
-  {name:"Uluçay Tantuni",cat:"Tantuni",alc:false,spec:"tantuni",desc:"Mersin usulü tantuninin Ankara'daki lezzetli adresi. İnce kıyma ve baharatlı sos.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Uluçay+Tantuni+Ankara"},
-  {name:"Sadık Usta Kale Cağ Kebabı",cat:"Kebap",alc:false,spec:"cağ kebabı",desc:"Erzurum usulü cağ kebabı. Kale'nin dibinde, otantik ortamda.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Sadık+Usta+Cağ+Kebabı+Ankara"},
-  {name:"Süha's",cat:"Döner",alc:false,spec:"döner",desc:"Ankara'nın sevilen döner duraklarından biri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Süha+Döner+Ankara"},
-  {name:"Kebapçı Halil Usta",cat:"Kebap",alc:false,spec:"küşleme",desc:"Ustanın elinden çıkan küşleme ile öne çıkan köklü kebapçı.",addr:"Ankara",map:"https://maps.google.com/?q=Kebapçı+Halil+Usta+Ankara"},
-  {name:"Beykoz Paça & İşkembe",cat:"Sakatat & Izgara",alc:false,spec:"kelle paça · işkembe",desc:"Geç saatlerin vazgeçilmezi. Kelle paça ve işkembe çorbası ile ünlü.",addr:"Ankara",map:"https://maps.google.com/?q=Beykoz+Paça+İşkembe+Ankara"},
-  {name:"Etlik Kuzu Kelle Söğüş",cat:"Sakatat & Izgara",alc:false,spec:"söğüş",desc:"Etlik'in meşhur kuzu kelle ve söğüş durağı.",addr:"Etlik, Keçiören",map:"https://maps.google.com/?q=Etlik+Kuzu+Kelle+Söğüş+Ankara"},
-  {name:"Kordon Söğüş",cat:"Sakatat & Izgara",alc:false,spec:"söğüş",desc:"Söğüş severlerin adresi. Taze ve lezzetli kuzu söğüş.",addr:"Ankara",map:"https://maps.google.com/?q=Kordon+Söğüş+Ankara"},
-  {name:"Barış Balık",cat:"Deniz Ürünleri",alc:false,spec:"balık",desc:"Taze balık ve deniz ürünleri. Sade ve lezzetli sunumuyla öne çıkıyor.",addr:"Ankara",map:"https://maps.google.com/?q=Barış+Balık+Ankara"},
-  {name:"Fevzi Hoca",cat:"Deniz Ürünleri",alc:false,spec:"balık",desc:"Ankara'nın sevilen balık adreslerinden. Günlük taze ürünler.",addr:"Ankara",map:"https://maps.google.com/?q=Fevzi+Hoca+Balık+Ankara"},
-  {name:"Müslüm Kebap",cat:"Kebap",alc:false,spec:"adana",desc:"Ankara'nın sevilen kebap duraklarından. Geleneksel tarif ve usta ellerin lezzeti.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Müslüm+Kebap+Ankara"}
+  {name:"Ciğerci Sadi",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"ciğer",desc:"Ankara'nın efsane ciğercisi. Kızarmış ciğer ve sac kavurma ile ünlü.",addr:"İskitler, Altındağ",map:"https://maps.google.com/?q=Ciğerci+Sadi+İskitler+Ankara"},
+  {name:"Zerdali",cat:"Pastane & Tatlı",alc:false,price:"₺",spec:"profiterol",desc:"Şehrin meşhur profiterolü. Narin choux hamuru ve bol soslu sunumuyla öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Zerdali+Ankara"},
+  {name:"Çukurova Çorba",cat:"Çorba & Ev Yemekleri",alc:false,price:"₺",spec:"kelle paça çorbası",desc:"Çeşit çeşit çorba ve ev usulü yemekler. Sabah erken saatlerde bile açık.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Çukurova+Çorba+Ankara"},
+  {name:"Boşnak Mutfağı Zeliha",cat:"Dünya Mutfağı",alc:false,price:"₺",spec:"közde tavuk",desc:"Otantik Boşnak lezzetleri. Börek, burek ve geleneksel tarifler.",addr:"Altındağ, Ankara",map:"https://maps.google.com/?q=Boşnak+Mutfağı+Zeliha+Ankara"},
+  {name:"Cevat Usta Kahvaltı",cat:"Kahvaltı",alc:false,price:"₺",spec:"kahvaltı",desc:"Geleneksel Türk kahvaltısı. Köy ürünleri ve geniş serpme tabakları.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Cevat+Usta+Kahvaltı+Ankara"},
+  {name:"Meşhur Köfteci Şahin Usta",cat:"Köfte & Izgara",alc:false,price:"₺",spec:"rumeli köftesi",desc:"Yıllardır değişmeyen tarif. İnce köfte, ekmek arası ya da porsiyon.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Köfteci+Şahin+Usta+Ankara"},
+  {name:"Kebapçı Canbolat",cat:"Döner",alc:false,price:"₺",spec:"döner",desc:"Mahallenin vazgeçilmez dönerci durağı. Lezzetli ve bol porsiyonlu.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebapçı+Canbolat+Ankara"},
+  {name:"Cici Piknik",cat:"Döner",alc:false,price:"₺",spec:"döner",desc:"Sevilen dönerci. Lezzetli döner çeşitleri ve hızlı servis.",addr:"Gölbaşı, Ankara",map:"https://maps.google.com/?q=Cici+Piknik+Ankara"},
+  {name:"Uludağ Kebap",cat:"Kebap",alc:true,price:"₺₺",spec:"iskender",desc:"Türk usulü kebap ve meze çeşitleri. Aile ortamına uygun salon.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Uludağ+Kebap+Ankara"},
+  {name:"Bolu Akın Lokantası",cat:"Esnaf Lokantası",alc:false,price:"₺₺",spec:"sulu et yemekleri",desc:"Sulu yemek ve tabldot kültürünün güvenilir adresi. Günlük taze pişirilen yemekler.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Bolu+Akın+Lokantası+Ankara"},
+  {name:"Mutlu Kebap",cat:"Kebap",alc:false,price:"₺",spec:"döner",desc:"Sade, lezzetli ve uygun fiyatlı kebap. Hızlı servis.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Mutlu+Kebap+Ankara"},
+  {name:"Kıtır",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"kokoreç · bira",desc:"Kıtır kokoreç ve enfes bira kombinasyonu. Ankara'nın en bilinen kokoreç duraklarından.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kıtır+Ankara"},
+  {name:"Kokoreççi Hacı",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"kokoreç",desc:"Usta ellerden çıkan klasik Ankara kokoreç. Baharatlı ve sade seçenekler.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Kokoreççi+Hacı+Ankara"},
+  {name:"Selami Usta",cat:"Döner",alc:false,price:"₺",spec:"döner · adana kebap",desc:"Izgara çeşitleri ve el yapımı köfte. Mahalle lokantası sıcaklığında.",addr:"Keçiören, Ankara",map:"https://maps.google.com/?q=Selami+Usta+Ankara"},
+  {name:"Kalbur",cat:"Deniz Ürünleri",alc:true,price:"₺₺",spec:"meze · ara sıcak",desc:"Taze balık ve deniz ürünleri. Mevsiminde değişen menü ve rakı sofrası.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kalbur+Balık+Ankara"},
+  {name:"Ara Sıcak",cat:"Meyhane & Meze",alc:true,price:"₺₺",spec:"meze · ara sıcak",desc:"Rakı sofrası geleneğini yaşatan meyhane. Zengin meze çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Ara+Sıcak+Ankara"},
+  {name:"Tirilye",cat:"Deniz Ürünleri",alc:true,price:"₺₺₺",spec:"balık · meze",desc:"Taze balık ve deniz ürünleri. Ege mutfağından ilham alan tarifler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tirilye+Ankara"},
+  {name:"Kumsal",cat:"Deniz Ürünleri",alc:true,price:"₺₺",spec:"balık · kuzu şiş",desc:"Günlük taze balık. Deniz ürünleri mevsime göre değişen menüyle sunuluyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kumsal+Restoran+Ankara"},
+  {name:"01 Adanalı İsmail Usta",cat:"Kebap",alc:true,price:"₺₺",spec:"adana kebap",desc:"Adana ve Urfa kebabı uzmanı. Kor ateşinde pişen geleneksel tarif.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Adanalı+İsmail+Usta+Ankara"},
+  {name:"Hamlakit",cat:"Kahvaltı",alc:false,price:"₺₺",spec:"kahvaltı",desc:"Hamsili pilav ve Karadeniz mutfağının özel tatları.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Hamlakit+Ankara"},
+  {name:"Göksu Lokantası",cat:"Çorba & Ev Yemekleri",alc:false,price:"₺₺",spec:"sufle",desc:"Güvenilir ev yemeği lokantası. Günlük değişen menü ve çorba çeşitleri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Göksu+Lokantası+Ankara"},
+  {name:"Stüdyo Pizza",cat:"Pizza & Fast Casual",alc:true,price:"₺₺",spec:"pizza",desc:"Taş fırında pizza. Yaratıcı soslar ve ince İtalyan hamuru.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Stüdyo+Pizza+Ankara"},
+  {name:"Tiftik",cat:"Burger & Fast Casual",alc:false,price:"₺",spec:"burger · tiramisu",desc:"Ankara'nın sevilen hamburgercisi. El yapımı köfte ve özel soslarıyla öne çıkıyor.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Tiftik+Hamburger+Ankara"},
+  {name:"Düveroğlu",cat:"Kebap",alc:false,price:"₺",spec:"lahmacun · kebap · baklava",desc:"Gaziantep mutfağının Ankara adresi. Katmer, lahmacun ve kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Düveroğlu+Ankara"},
+  {name:"Şehir Kebapçısı",cat:"Kebap",alc:false,price:"₺₺",spec:"adana",desc:"Şehir merkezi kebap durağı. Lüle ve döner seçenekleri ön planda.",addr:"Kızılay, Çankaya",map:"https://maps.google.com/?q=Şehir+Kebapçısı+Ankara"},
+  {name:"Kanatçı Tarık",cat:"Köfte & Izgara",alc:false,price:"₺",spec:"tavuk kanat",desc:"Pişirilme şekliyle ayrışan tavuk kanat. Acılı ve sade seçenekler.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kanatçı+Tarık+Ankara"},
+  {name:"Çankaya Lokantası",cat:"Esnaf Lokantası",alc:false,price:"₺",spec:"döner · ev yemeği",desc:"Köklü mahalle lokantası. Ev usulü yemeklerin güvenilir adresi.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Çankaya+Lokantası+Ankara"},
+  {name:"Germeç Piliç",cat:"Köfte & Izgara",alc:false,price:"₺",spec:"tavuk",desc:"Fırın ve ızgara tavuk çeşitleri. Porsiyon büyüklüğüyle öne çıkıyor.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Germeç+Piliç+Ankara"},
+  {name:"Hüsrev",cat:"Esnaf Lokantası",alc:false,price:"₺",spec:"kuru fasulye",desc:"Sulu yemek geleneğini yaşatan köklü esnaf lokantası. Günlük değişen tabldot.",addr:"Ulus, Ankara",map:"https://maps.google.com/?q=Hüsrev+Ankara"},
+  {name:"Kebap 49",cat:"Kebap",alc:false,price:"₺",spec:"kıymalı pide",desc:"49 yıllık gelenek. Taş fırın ekmeğiyle servis edilen has kebap.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Kebap+49+Ankara"},
+  {name:"Tarihi Mutfak Lokantası",cat:"Esnaf Lokantası",alc:false,price:"₺₺",spec:"tandır",desc:"Tarihi binada ev yemeği deneyimi. Geleneksel Ankara mutfağı.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Tarihi+Mutfak+Lokantası+Ankara"},
+  {name:"Tavukçu Lokantası",cat:"Köfte & Izgara",alc:true,price:"₺₺",spec:"kiremitte işkembe",desc:"Tavuk döner ve ızgara ürünlerinde uzman. Hızlı ve lezzetli.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Tavukçu+Lokantası+Ankara"},
+  {name:"Uluçay Tantuni",cat:"Tantuni",alc:false,price:"₺",spec:"tantuni",desc:"Mersin usulü tantuninin Ankara'daki lezzetli adresi. İnce kıyma ve baharatlı sos.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Uluçay+Tantuni+Ankara"},
+  {name:"Sadık Usta Kale Cağ Kebabı",cat:"Kebap",alc:false,price:"₺",spec:"cağ kebabı",desc:"Erzurum usulü cağ kebabı. Kale'nin dibinde, otantik ortamda.",addr:"Ulus, Altındağ",map:"https://maps.google.com/?q=Sadık+Usta+Cağ+Kebabı+Ankara"},
+  {name:"Süha's",cat:"Döner",alc:false,price:"₺",spec:"döner",desc:"Ankara'nın sevilen döner duraklarından biri.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Süha+Döner+Ankara"},
+  {name:"Kebapçı Halil Usta",cat:"Kebap",alc:false,price:"₺",spec:"küşleme",desc:"Ustanın elinden çıkan küşleme ile öne çıkan köklü kebapçı.",addr:"Ankara",map:"https://maps.google.com/?q=Kebapçı+Halil+Usta+Ankara"},
+  {name:"Beykoz Paça & İşkembe",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"kelle paça · işkembe",desc:"Geç saatlerin vazgeçilmezi. Kelle paça ve işkembe çorbası ile ünlü.",addr:"Ankara",map:"https://maps.google.com/?q=Beykoz+Paça+İşkembe+Ankara"},
+  {name:"Etlik Kuzu Kelle Söğüş",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"söğüş",desc:"Etlik'in meşhur kuzu kelle ve söğüş durağı.",addr:"Etlik, Keçiören",map:"https://maps.google.com/?q=Etlik+Kuzu+Kelle+Söğüş+Ankara"},
+  {name:"Kordon Söğüş",cat:"Sakatat & Izgara",alc:false,price:"₺",spec:"söğüş",desc:"Söğüş severlerin adresi. Taze ve lezzetli kuzu söğüş.",addr:"Ankara",map:"https://maps.google.com/?q=Kordon+Söğüş+Ankara"},
+  {name:"Barış Balık",cat:"Deniz Ürünleri",alc:false,price:"₺",spec:"balık",desc:"Taze balık ve deniz ürünleri. Sade ve lezzetli sunumuyla öne çıkıyor.",addr:"Ankara",map:"https://maps.google.com/?q=Barış+Balık+Ankara"},
+  {name:"Fevzi Hoca",cat:"Deniz Ürünleri",alc:false,price:"₺₺",spec:"balık",desc:"Ankara'nın sevilen balık adreslerinden. Günlük taze ürünler.",addr:"Ankara",map:"https://maps.google.com/?q=Fevzi+Hoca+Balık+Ankara"},
+  {name:"Müslüm Kebap",cat:"Kebap",alc:false,price:"₺",spec:"adana",desc:"Ankara'nın sevilen kebap duraklarından. Geleneksel tarif ve usta ellerin lezzeti.",addr:"Çankaya, Ankara",map:"https://maps.google.com/?q=Müslüm+Kebap+Ankara"}
 ];
 const cats=["Tümü",...[...new Set(places.map(p=>p.cat))].sort()];
-let activecat="Tümü",alcFilter="all",showFavs=false;
+let activecat="Tümü",alcFilter="all",priceFilter="all",showFavs=false;
 let favs=new Set();
 try{const s=localStorage.getItem('ag_favs');if(s)favs=new Set(JSON.parse(s))}catch(e){}
 function saveFavs(){try{localStorage.setItem('ag_favs',JSON.stringify([...favs]))}catch(e){}}
 function toggleFav(name,e){e.stopPropagation();if(favs.has(name))favs.delete(name);else favs.add(name);saveFavs();render()}
 function toggleFavs(){showFavs=!showFavs;document.getElementById('fav-toggle').classList.toggle('active',showFavs);render()}
 function setAlc(v,el){alcFilter=v;document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');render()}
-function setFilter(cat){activecat=cat;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));render()}
+function setPrice(v,el){priceFilter=v;document.querySelectorAll('[data-price]').forEach(b=>b.classList.remove('active'));el.classList.add('active');render()}activecat=cat;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));render()}
 function render(){
   const q=document.getElementById('search').value.toLowerCase();
   const filtered=places.filter(p=>{
@@ -178,7 +185,7 @@ function render(){
     if(activecat!=="Tümü"&&p.cat!==activecat)return false;
     if(alcFilter==="alc"&&!p.alc)return false;
     if(alcFilter==="nalc"&&p.alc)return false;
-    if(showFavs&&!favs.has(p.name))return false;
+    if(priceFilter!=="all"&&p.price!==priceFilter)return false;
     return true;
   });
   document.getElementById('counter').textContent=filtered.length+' mekan';
@@ -198,6 +205,7 @@ function render(){
         <div class="tags">
           <span class="tag">${p.cat}</span>
           <span class="tag ${p.alc?'alc':'nalc'}">${p.alc?'İçkili':'Alkolsüz'}</span>
+          ${p.price?`<span class="tag price">${p.price}</span>`:''}
         </div>
         ${p.spec?`<div class="card-spec">🍽 ${p.spec}</div>`:''}
         <div class="card-desc">${p.desc}</div>
